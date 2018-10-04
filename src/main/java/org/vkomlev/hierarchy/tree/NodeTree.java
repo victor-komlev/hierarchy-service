@@ -111,17 +111,17 @@ public class NodeTree {
     LinkedList<String> whiteSet = new LinkedList<>(nodeMap.keySet());
     Set<String> greySet = new LinkedHashSet<>();
     Set<String> blackSet = new LinkedHashSet<>();
-    Map<String, String> dfsMap = new LinkedHashMap<>();
+    StringBuilder dfsTrace = new StringBuilder();
     while (!whiteSet.isEmpty()) {
       String nodeId = whiteSet.getFirst();
-      recursiveCycleCheck(nodeId, whiteSet, greySet, blackSet, dfsMap);
+      recursiveCycleCheck(nodeId, whiteSet, greySet, blackSet, dfsTrace);
     }
   }
 
   private void recursiveCycleCheck(String id, List<String> whiteSet, Set<String> greySet,
-      Set<String> blackSet, Map<String, String> dfsMap) {
+      Set<String> blackSet, StringBuilder dfsTrace) {
     if (greySet.contains(id)) {
-      throw new HierarchyException("Cycle Detected \n" + dfsMap);
+      throw new HierarchyException("Cycle Detected \n" + dfsTrace);
     }
     if (blackSet.contains(id)) {
       return;
@@ -129,9 +129,10 @@ public class NodeTree {
     whiteSet.remove(id);
     greySet.add(id);
     Node node = nodeMap.get(id);
+    dfsTrace.append("ChildId[").append(id).append("] -> ParentId[").append(node.getParentId()).append("]\n");
     node.getChildren().forEach(
         (nodeName, childNode) -> recursiveCycleCheck(childNode.getId(), whiteSet, greySet, blackSet,
-            dfsMap));
+            dfsTrace));
     greySet.remove(id);
     blackSet.add(id);
   }
